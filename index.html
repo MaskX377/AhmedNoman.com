@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        /* Basic styling for the game board */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #222;
+        }
+        canvas {
+            border: 2px solid #fff;
+        }
+        a {
+            color: white; /* Set link color to white */
+            text-decoration: none; /* Remove underline */
+        }
+    </style>
+</head>
+<body>
+
+	<u>Ahmed Noman<u/>
+    <a href="https://www.youtube.com/watch?v=rqreB6aME34" target="_blank">Flapping Triangle</a>
+    <canvas id="board"></canvas>
+
+    <script>
+        const blockSize = 17; // Size of each block (snake segment)
+        const totalRows = 17; // Total rows in the game board
+        const totalCols = 17; // Total columns in the game board
+
+        const board = document.getElementById("board");
+        const context = board.getContext("2d");
+
+        let snakeX = blockSize * 5;
+        let snakeY = blockSize * 5;
+        let speedX = 0; // Initial speed in X direction
+        let speedY = 0; // Initial speed in Y direction
+        let snakeBody = [];
+        let foodX;
+        let foodY;
+        let gameOver = false;
+
+        window.onload = function () {
+            board.height = totalRows * blockSize;
+            board.width = totalCols * blockSize;
+            placeFood();
+            document.addEventListener("keyup", changeDirection);
+            setInterval(update, 1000 / 10); // Adjust the interval for desired speed
+        };
+
+        function update() {
+            if (gameOver) {
+                return;
+            }
+            context.fillStyle = "green";
+            context.fillRect(0, 0, board.width, board.height);
+            context.fillStyle = "yellow";
+            context.fillRect(foodX, foodY, blockSize, blockSize);
+
+            if (snakeX === foodX && snakeY === foodY) {
+                snakeBody.push([foodX, foodY]);
+                placeFood();
+            }
+
+            for (let i = snakeBody.length - 1; i > 0; i--) {
+                snakeBody[i] = snakeBody[i - 1];
+            }
+            if (snakeBody.length) {
+                snakeBody[0] = [snakeX, snakeY];
+            }
+
+            context.fillStyle = "white";
+            snakeX += speedX * blockSize;
+            snakeY += speedY * blockSize;
+            context.fillRect(snakeX, snakeY, blockSize, blockSize);
+
+            for (let i = 0; i < snakeBody.length; i++) {
+                context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
+            }
+
+            if (
+                snakeX < 0 ||
+                snakeX > totalCols * blockSize ||
+                snakeY < 0 ||
+                snakeY > totalRows * blockSize
+            ) {
+                gameOver = true;
+                alert("Game Over");
+            }
+
+            for (let i = 0; i < snakeBody.length; i++) {
+                if (snakeX === snakeBody[i][0] && snakeY === snakeBody[i][1]) {
+                    gameOver = true;
+                    alert("Game Over");
+                }
+            }
+        }
+
+        function placeFood() {
+            foodX = Math.floor(Math.random() * totalCols) * blockSize;
+            foodY = Math.floor(Math.random() * totalRows) * blockSize;
+        }
+
+        function changeDirection(e) {
+            if (e.code === "ArrowUp" && speedY !== 1) {
+                speedX = 0;
+                speedY = -1;
+            } else if (e.code === "ArrowDown" && speedY !== -1) {
+                speedX = 0;
+                speedY = 1;
+            } else if (e.code === "ArrowLeft" && speedX !== 1) {
+                speedX = -1;
+                speedY = 0;
+            } else if (e.code === "ArrowRight" && speedX !== -1) {
+                speedX = 1;
+                speedY = 0;
+            }
+        }
+    </script>
+</body>
+</html>
